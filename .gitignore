@@ -38,6 +38,12 @@ codegen/
 # resource folder
 resources/
 
+# Generated figures in the simulation
+simulation/*.pdf
+
+# Generated FOP in the simulation
+simulation/PassCarModel_Final_OperationPoint.mat
+
 # Publication
 article/article.log
 article/article.pdf
