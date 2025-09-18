@@ -230,25 +230,27 @@
 	\begin{figure*}[ht]
 		\centering
 		\includegraphics[width=\textwidth]{figures/SAC_all_performance.pdf}
-		\caption{Simulation 1: Baseline ABS operation. Simulation 2: a conventional fuzzing of input signals Simulation 3: conventional fuzzing without signal filtering. Simulation 4-7: Fuzzing with a trained agent with pattern $a$ - $c$.}
+		\caption{Simulation 1: Baseline ABS operation. Simulation 2: a conventional fuzzing of input signals Simulation 3: conventional fuzzing without signal filtering. Simulation 4-7: Fuzzing with a trained agent $Agent_a$ - $Agent_d$.}
 		\label{FIG:Performance}
 	\end{figure*}		
 		
 	Four noise injection patterns (i.e. tampering digital wheel speed sensor signals) are tested in the emergency brake use case to achieve optimal test execution parameters. The injected noise is sampled from a Gaussian distribution parameterized with different mean and different distributions.
 	
 	\begin{enumerate}[a)]
-		\item Continuous action space with additional noise.
-		Let $\textbf{a}_{min}, \textbf{a}_{max} \in \textbf{R}^4$, $\textbf{a} \in \aspace$ if $\textbf{a}_{min} \leq \textbf{a} \leq \textbf{a}_{max}$ and $a_i \sim \mathcal{N}(\mu_i, \sigma_i^2), i=1,\ldots,4$. The sampled wheel speed sensor signals are mixed with $a_i$ actions resulting in $z_i$ inputs to the ABS controller. $a_1$ is mixed to the front left wheel speed sensor signal, $a_2$ to the front right, and so on. See Figure~\ref{fig:system3}. The action is constant for $\Delta t = 0.1 s$
-		\item Continuous action space without additional noise.
+		\item Continuous action space with additional noise.\\
+		Let $\mathbf{a}_{min}, \mathbf{a}_{max} \in \mathbf{R}^4$, $\mathbf{a} \in \aspace$ if $\mathbf{a}_{min} \leq \mathbf{a} \leq \mathbf{a}_{max}$ and $a_i \sim \mathcal{N}(\mu_i, \sigma_i^2), i=1,\ldots,4$. The sampled wheel speed sensor signals are mixed with $a_i$ actions resulting in $z_i$ inputs to the ABS controller. $a_1$ is mixed to the front left wheel speed sensor signal, $a_2$ to the front right, and so on. See Figure~\ref{fig:system3}. The action is constant for $\Delta t = 0.1 s$.\\
+		\item Continuous action space without additional noise.\\
 		The same as above, only the distribution is zeroed $\sigma_i=0, i=1,..4$, resulting in deterministic $\textbf{a}$ noise. The action is constant for $\Delta t = 0.01 s$
-		\item Discrete action space with additional noise.
+		\item Discrete action space with additional noise.\\
 		Let $\boldsymbol{\mu} = \{\mu_1,\ldots,\mu_{10} \}$, $\boldsymbol{\sigma} = \{\sigma_1,\ldots,\sigma_{10}\}$ and $\textbf{a} \in \boldsymbol{\mu} \times \boldsymbol{\sigma}$ and $a \sim \mathcal{N}(\mu_i, \sigma_j^2)$ The sampled wheel speed sensor signals are all mixed with the same $a$ action. The action is constant for $\Delta t = 0.1 s$
-		\item Discrete action space without additional noise.
+		\item Discrete action space without additional noise.\\
 		The same as above, only the distribution is zeroed again, so $\textbf{a} \in \boldsymbol{\mu}$. The action is constant for $\Delta t = 0.01 s$
 	\end{enumerate}                        		
+	
+	$Agent_a$ is using pattern $a$, $Agent_b$, $Agent_c$ and $Agent_d$ are using patterns $b$, $c$ and $d$ respectively.
 			
 	\subsection{Training}
-	The trained agent is "disturbing" the ABS operation. ~\autoref{FIG:Performance} shows the baseline operation and the four test cases. The upper graph row shows wheel speeds and at the lower row the lateral acceleration during the braking. The failing ABS control either does not optimally utilize the adhesion resulting in longer stopping distance or in lost control. The test strategy in which real noise is also injected (pattern $a$ and $c$) besides the selected false target signal value shows better results in terms of more degraded overall ABS operation. The agent using continuous action space with noise (pattern $a$) was able to block the front wheels, however the ABS control was able to get back to a better operation range. The overall best agent is the one which utilized a discrete action space efficiently disturbing the performance with frequent over-optimal wheel braking.
+	The trained agent is "disturbing" the ABS operation. ~\autoref{FIG:Performance} shows the baseline operation and the four test cases. The upper graph row shows wheel speeds and at the lower row the lateral acceleration during the braking. The failing ABS control either does not optimally utilize the adhesion resulting in longer stopping distance or in lost control. The test strategy in which real noise is also injected (pattern $a$ and $c$) besides the selected false target signal value shows better results in terms of more degraded overall ABS operation. The $Agent_a$ using continuous action space with noise (pattern $a$) was able to block the front wheels, however the ABS control was able to get back to a better operation range. The overall best agent ($Agent_c$) is the one which utilized a discrete action space efficiently disturbing the performance with frequent over-optimal wheel braking.
 	
 	\begin{figure*}[hb]
 		\centering
@@ -262,7 +264,7 @@
 	\begin{figure*}[h]
 		\centering
 		\includegraphics[width=\textwidth]{figures/SAC_all_wheelspeeds.pdf}
-		\caption{Result of the optimized test environment. Simulation 4-7: Fuzzing with a trained agent with pattern $a$ - $c$. The upper row is the speed of the front left wheel and the lower row shows the front right wheel speeds. In each graph wheel speeds are shown in red and the mean value of the noise with blue. The shaded area around the blue curve is the distribution of the random noise.}
+		\caption{Result of the optimized test environment. Simulation 4-7: Fuzzing with a trained agents $Agent_a$ - $Agent_d$. The upper row is the speed of the front left wheel and the lower row shows the front right wheel speeds. In each graph wheel speeds are shown in red and the mean value of the noise with blue. The shaded area around the blue curve is the distribution of the random noise.}
 		\label{FIG:TestResults}
 	\end{figure*}	
 	
@@ -270,16 +272,19 @@
 	~\autoref{FIG:TrainingResult} shows the ABS braking in a curve (episode) performance degradation (reward). Five different instances of each agent variant with different random seeds were trained, with each performing 2000 episodes. The solid curves corresponds to the mean and the shaded region to the minimum and maximum returns over the five trials.
 	Learning of the agent with continuous action space with noise converges its episode award (accumulated lateral acceleration during ABS braking) of $\sim7.5 \frac{m}{s^2}$. These values are achieved from approximately after the 1000th learning iteration. Learning of the agent with continuous action space without noise achieve $\sim10 \frac{m}{s^2}$ a bit earlier, from approximately after the 800th iteration but it struggles to keep it stable. The best performing agent (the one with discrete action space with noise) achieves its stable optimum $\sim6.5 \frac{m}{s^2}$ beyond approximately 1300th iterations. And lastly the worst performing agent reach its peek performance $\sim10 \frac{m}{s^2}$ at the end of the learning schedule at round about 1900-200th iterations.
 	
-	\begin{table}[hb]
+	\begin{table}[hb]		
+		\renewcommand{\arraystretch}{1.4} % Increases row spacing
 		\centering		
-		\renewcommand{\arraystretch}{1.2} % Increases row spacing
+		\vspace{1mm}
 		\begin{tabular}{l|c|c|c}			
+			\toprule
 			Action space & Exp. reward & Max. reward & Speed \\
-			\hline
+			\midrule
 			Cont. w. noise    & $\sim7.5\frac{m}{s^2}$  & $\sim6.5\frac{m}{s^2}$  & $\sim 1000$                \\
 			Cont. wo. noise   & $\sim10\frac{m}{s^2}$   & $\sim8.5\frac{m}{s^2}$ & $\sim 800$                 \\
 			Disc. w. noise    & $\sim6.5\frac{m}{s^2}$  & $\sim5\frac{m}{s^2}$   & $\sim 1300$                \\
 			Disc. wo. noise   & $\sim10\frac{m}{s^2}$   & $\sim8.3\frac{m}{s^2}$ & $\sim 1900$                \\			
+			\bottomrule
 		\end{tabular}				
 		\caption{Comparison of agents with different action spaces and noise strategies in terms of reward and learning speed.}
 		\label{tab:action_space_comparison}
@@ -290,17 +295,25 @@
 	\subsection{Results}
 	Using conventional fuzzing the degradation of the lateral acceleration is relatively small, the test does not exploit potential issues of the filter, however the fuzzing has an effect as the simulation without signal filter shows. The accumulated lateral acceleration in the continuous, offset and range action space is 6.47 $\frac{m}{s^2}$, in the continuous and offset only case is 8.57 $\frac{m}{s^2}$, in the discrete, offset and range action space is 4.99 $\frac{m}{s^2}$, in the discrete and offset only case is 8.30 $\frac{m}{s^2}$ 
 	The agents with continuous action space has the option to influence ABS control with optimized target deviation signals, while in case of agents with discrete action space the common target deviation is used for both axles. \autoref{FIG:TestResults} shows in the first two columns the different deviation targets and the last two columns the common targets. The resulting wheel speeds are different in the two sides even in the case of common actions due to the turning maneuver. The test trial shows that despite that the agents with side wise separated actions have the option to influence the lateral acceleration with the effect of different side wise braking force, it has not been exploited.
-	\todo{Add simulation w base agent, on different curves and different mue}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\columnwidth]{figures/AgentPerformanceGrid.pdf}
+		\caption{Using the agent of pattern $c$ on different maneuvers. The graphs are showing the lateral acceleration during braking over the braking period. The upper lines in each figure is the base line performance, while the lower line is the result of the trained agent injecting noises.}
+		\label{FIG:PerformanceGrid}
+	\end{figure}	
+	
+	The agent is trained on a specific maneuver described earlier, however it still performs on different driving conditions. \autoref{FIG:PerformanceGrid} shows emergency braking on different road surfaces and with different evasions. From left to right the road friction varies as $\mu \in [0.4, 0.5, 0.6, 0.7, 0.8]$ and from top to down as $ valami \in [a b c a]$. As expected the figures show decreasing stopping distances as the road surface becomes drier and wheels have more grip. The agent shows good performance in test cases with low $\mu$ and it is less efficient when the friction is higher. 
+	
+	The ABS controller has to achieve the goal in which the vehicle stops the quickest but it still can be steered. As \autoref{FIG:WheelSlips} shows if the controller optimizes for a higher slips depending on the road conditions it achieves higher longitudinal braking force, while less lateral force. And vice versa from steering point of view the optimum is at the lower slips. The agents are trained to decrease the ABS performance of steering ability, which resulted in improving the stopping distances. This explains that the graphs show improved stopping distance when agent disturbs the ABS operation. 
 			
 	\subsection{Hyperparameters}
 	
 	\autoref{tab:shared_params} lists the common SAC parameters used in the comparative evaluation in \autoref{FIG:Performance}.
 	
-	\begin{table}[H]
+	\begin{table}[b]
 		\renewcommand{\arraystretch}{1.1}
-		\centering
-		\caption{SAC Hyperparameters}
-		\label{tab:shared_params}
+		\centering		
 		\vspace{1mm}
 		\begin{tabular}{l| l }
 			\toprule
@@ -320,6 +333,8 @@
 			target update interval & 1\\			
 			\bottomrule
 		\end{tabular}
+		\caption{SAC Hyperparameters}
+		\label{tab:shared_params}
 	\end{table}
 	
 	\section{Conclusion}
