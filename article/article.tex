@@ -11,7 +11,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{comment}
-\usepackage{todonotes}
+%\usepackage{todonotes}
 \usepackage{float}
 \input{defs}
 
@@ -21,7 +21,7 @@
 
 \begin{document}
 	\begin{keywords}
-		fuzz testing \sep reinforcement learning \sep SAC
+		fuzz testing \sep deep reinforcement learning \sep functional safety \sep cyber security \sep automotive
 	\end{keywords}
 	
 	
@@ -29,13 +29,16 @@
 	
 	\begin{abstract}
 		Fuzz testing (or fuzzing) is a dynamic software testing technique that involves sending random, malformed, or unexpected inputs to a system to uncover vulnerabilities, crashes, or unexpected behavior. In automotive systems, this is particularly useful for testing Electronic Control Units (ECUs), in-vehicle communication protocols (e.g., CAN, LIN, FlexRay) or diagnostic interfaces (e.g., UDS - ISO 14229). A custom fuzzer can be used to target the CAN bus and simulate attacks or faults, helping engineers identify weaknesses before vehicles go into production. The implementation of fuzz testing can be challenging in terms of efficiency in finding issues in the vehicle or its components. 
-		The proposed test method explores the stability of the investigated control system, the quality of its sensor signal conditioning algorithms and the its ability to learn external interventions. The proposed method shall find the worst controller performance by keeping its base operation alive. The optimized test schedule and can be repetitively used later to evaluate the control algorithm as well as its infrastructure like signal conditioning and security protection.
+		The proposed test method explores the stability of the investigated control system, the quality of its sensor signal conditioning algorithms and its ability to learn external interventions. The proposed method automatically find the worst controller performance by keeping its base operation alive. The optimized test schedule and can be repetitively used later to evaluate the control algorithm as well as its infrastructure like signal conditioning and security protection.
 	\end{abstract}
 	
 	\section{Introduction}
-	ISO/SAE 21434 standard governs cybersecurity engineering for road vehicles. It explicitly recommends fuzz testing as part of the validation process. Components rated CAL (Cybersecurity Assurance Level) 2 or higher should undergo fuzz testing. CAL 3 and 4 require advanced fuzzing, including adaptive input generation. Fuzz testing shall be applied early and systematically throughout the product lifecycle to detect vulnerabilities and reduce remediation costs. Furthermore fuzzing supports TARA (Threat Agent Risk Assessment) by automating risk identification and mitigation.
 	
-	While ISO 26262 (international standard for functional safety in road vehicles, focusing on electrical/electronic systems) primarily addresses systematic failures and random hardware faults, fuzz testing complements it by targeting software robustness—especially in scenarios involving unexpected or malformed inputs. This is particularly relevant for advanced driver assistance systems (ADAS), autonomous driving features and vehicle communication protocols (e.g., CAN, LIN, Ethernet). Fuzz testing can be integrated into the verification and validation phases of ISO 26262 to uncover hidden software vulnerabilities that might compromise safety.
+	ISO 26262 (international standard for functional safety in road vehicles, focusing on electrical/electronic systems) primarily addresses systematic failures and random hardware faults, fuzz testing complements it by targeting software robustness—especially in scenarios involving unexpected or malformed inputs. This is particularly relevant for advanced driver assistance systems (ADAS), autonomous driving features and vehicle communication protocols (e.g., CAN, LIN, Ethernet). Fuzz testing can be integrated into the verification and validation phases of ISO 26262 to uncover hidden software vulnerabilities that might compromise safety.
+	
+	While ISO/SAE 21434 standard governs cybersecurity engineering for road vehicles. It explicitly recommends fuzz testing as part of the validation process. Components rated CAL (Cybersecurity Assurance Level) 2 or higher should undergo fuzz testing. CAL 3 and 4 require advanced fuzzing, including adaptive input generation. Fuzz testing shall be applied early and systematically throughout the product lifecycle to detect vulnerabilities and reduce remediation costs. Furthermore fuzzing supports TARA (Threat Agent Risk Assessment) by automating risk identification and mitigation.
+	
+	Modern vehicles rely on numerous Electronic Control Units (ECUs) that communicate via the Controller Area Network (CAN) to manage critical functions efficiently. While the CAN enables efficient vehicle control through inter-ECU communication, it presents critical security vulnerabilities. Notably, the broadcast nature of CAN messages, transmitted without encryption, allows adversaries to eavesdrop on all network traffic. Additionally, the absence of access control and authentication mechanisms permits attackers to inject malicious messages, potentially compromising vehicle safety and control.
 		
 	\subsection{Related work}
 	
@@ -45,21 +48,26 @@
 	
 	A security analysis and reverse engineering case study conducted on an instrument cluster ECU demonstrated the applicability of fuzz testing during the later stages of product development \cite{anistoroaei2022security}. Future research should aim to enhance the methodologies for extracting meaningful and actionable metrics from fuzz testing processes.
 	
-	Furthermore, a recent study \cite{wang2020real} have proposed sensor-based solutions for automotive systems that concurrently enhance safety—by meeting real-time and recovery requirements—and cybersecurity, through improved attack detection capabilities. 
+	Furthermore, a recent study \cite{wang2020real} have proposed sensor-based solutions for automotive systems that concurrently enhance safety—by meeting real-time and recovery requirements—and cybersecurity, through improved attack detection capabilities. The existing security models are not enough robust yet because the busload of CAN and level of cryptographic strategy are not considered enough to be implemented in the frame. The enhancement of CAN, which has been upgraded to Controller Area Network with Flexible Data Rate (CAN-FD), provides high bandwidth and bigger payload, is a basis of new security models based on encryption and authentication.\cite{AUTOSAR_SecOC_R24_11}
 	
-	Fuzz testing techniques have evolved since its introduction, American Fuzzy Lop (AFL) is a fuzz testing framework that utilizes an instrumentation method and a genetic algorithms to generate diverse test cases, enabling the discovery of numerous software vulnerabilities \cite{zalewski2017american}. Despite its widespread adoption and proven effectiveness, AFL relies on blind mutation strategies lacking guided input generation. To overcome these limitations, several improved variants have been developed, including AFLFast \cite{bohme2016coverage}, AFL++ \cite{fioraldi2020afl++} and fuzzing based on Control Flow Graph Optimization \cite{10662925}.
+	Fuzz testing techniques have evolved since its introduction, American Fuzzy Lop (AFL) is a fuzz testing framework that utilizes an instrumentation method and a genetic algorithms to generate diverse test cases, enabling the discovery of numerous software vulnerabilities \cite{zalewski2017american}. Despite its widespread adoption and proven effectiveness, AFL relies on blind mutation strategies lacking guided input generation. To overcome these limitations, several improved variants have been developed, including AFLFast \cite{bohme2016coverage}, AFL++ \cite{fioraldi2020afl++} and fuzzing based on Control Flow Graph Optimization \cite{10662925}. To improve the possibility of exposing defects, fuzzers use feedback from executions, such as execution state, results and fitness. A typical fitness is base on code coverage, which is used to determine the reward for the generated inputs. The current fuzzers have a common improvement of optimizing fuzzing process or enrich the information for fitness by utilizing among others machine learning and deep learning methods.\cite{zhu2022fuzzing}
 	
-	Intellignet fuzzing...\todo{close the paragraph...}
-	\cite{zhu2022fuzzing}
-	\todo{add control sensitivity}
+	Automotive security testing primarily targets the vehicle's attack surfaces, which are typically located on either external communication interfaces (e.g., Vehicle-to-Everything, V2X) or internal network systems (e.g., In-Vehicle Networks, IVN). Machine learning classifiers are used to generate a risk score associated with the failure class, relative severity, and robustness of the failure from the vast fuzzing logs \cite{kayas2023ai}. 
+	For testing intrusion detection algorithms a fuzzer generating messages conform to the in-vehicle communication protocol by utilizing Generative Adversarial Networks (GAN) was developed \cite{li2022gan}.
+	
+	Deep Reinforcement Learning (DRL) methods proposed widely to address cyberattacks including DRL-based security methods for cyber–physical systems, autonomous intrusion detection techniques, and multiagent DRL-based game theory simulations for defense strategies \cite{nguyen2021deep} \cite{ferdowsi2018robust}.
 	
 	\subsection{Motivation and ambitions}
 	
-	The fuzzing procedure consists of injecting Controller Area Network (CAN) messages with both randomized identifiers and messages with valid CAN identifiers but randomized payloads, in order to systematically evaluate the response behavior of Electronic Control Units (ECUs) within the network. This capability is particularly advantageous when actual vehicle components are integrated into a testbed, as it enables researchers to monitor their responses to a range of CAN messages. Such observations may reveal unwanted functionalities or latent vulnerabilities within the system. 
+	One of the widespread technique used by attackers is the masquerade attack. The attack manipulates the normal communication flow to a targeted ECU by injecting forged messages into the CAN network, thereby disrupting legitimate message delivery. This scenario presents significant challenges for simulation, as it necessitates the compromise of one or more components in the vehicle network (ECUs or sensors). Accurately replicating such conditions would require programming the simulated component to exhibit vulnerabilities analogous to those found in real-world systems, which extends beyond the scope of CAN bus simulation and is highly dependent on the specific characteristics of the individual ECUs. As a result, this type of attack lacks generalization across different CAN bus implementations.
 	
-	The masquerade attack is changing the legitimate message flow toward an ECU by injecting spoofed messages into the network. This scenario presents significant challenges for simulation, as it necessitates the compromise of one or more components in the vehicle network (ECUs or sensors). Accurately replicating such conditions would require programming the simulated component to exhibit vulnerabilities analogous to those found in real-world systems, which extends beyond the scope of CAN bus simulation and is highly dependent on the specific characteristics of the individual ECUs. As a result, this type of attack lacks generalization across different CAN bus implementations.
+	The fuzzing procedure consists of injecting CAN messages with both randomized identifiers and messages with valid CAN identifiers but randomized payloads, in order to systematically evaluate the response behavior of Electronic Control Units (ECUs) within the network. This capability is particularly advantageous when actual vehicle components are integrated into a testbed, as it enables researchers to monitor their responses to a range of CAN messages. Such observations may reveal unwanted functionalities or latent vulnerabilities within the system. 
 	
-	This paper outlines a concept of an automated black-box test environment for verification of ECU behavior on masquerade attack as well as sensitivity of noise present in the vehicle network. The concept can be developed to a test framework for evaluation functional safety and cyber security requirements.\todo{add functional safety with fuzz}
+	To identify CAN messages capable of influencing safety-critical ECU operations, researchers have explored CAN fuzzing techniques. However, existing approaches typically generate fuzzing inputs randomly without accounting for message content, leading to prolonged fuzzing duration.
+	
+	The main focus of existing fuzzing solutions to test the vehicle communication network, its intrusion detection capabilities and gateway securities \cite{9713864},\cite{8416255}, \cite{9719242}, \cite{fowler2019method}.
+				
+	This paper outlines a concept of an automated black-box test environment for verification of ECU behavior on masquerade attack as well as sensitivity of noise present in the vehicle network. The concept can be developed to a test framework for evaluation functional safety and cyber security requirements.
 	
 	\section{Methodology}
 	\subsection{Smart fuzz test tool for vehicle control}
@@ -103,14 +111,13 @@
 	\end{equation}
 	
 	
-	Let $x\in\Rset^n$ be the state variable, $R_x$ be a stochastic variable whose distribution depends on 
-	$x$, $\psi(a, x) = |a-x|$ the noise function and $\psi[k] = |a[k] - x[k]|, k=0,1,\ldots$. The $a[k]$ can be expressed as:
+	Let $x\in\Rset^n$ be the state variable, $\psi(a, x) = |a-x|$ the noise function and $\psi[k] = |a[k] - x[k]|, k=0,1,\ldots$. The $a[k]$ can be expressed as:
 	
 	\begin{align}
-		a[k] \sim P_{\aspace|x}(q, x[k])
+		a[k] \sim \pi(a[k]|x[k])
 	\end{align}
 	
-	where $P_{\aspace|x}$ is the conditional probability distribution of $\aspace$ given state $x$. See \autoref{fig:system3}.
+	where $\pi(a[k]|x[k])$ is the probability of taking action $a[k]$ in state $x[k]$. See \autoref{fig:system3}.
 	
 	The noise density can be reduced in a way that not every true sample is followed by a stochastic sensor value.
 	
@@ -124,10 +131,10 @@
 	
 	Similarly if the controller rejects sensor value and use only the last accepted sample, its performance shall be acceptable.
 	The test system continuously monitors the ECU operation and reports if the added noise brakes or degrades the operation. 
-	In order to minimize the execution cost of fuzz testing, the added test component shall minimize the controller output (i.e. degrade its performance), maximize the noise level while keeping the ECU functional $\psi(k) \in C(x[k-1])$.
+	In order to minimize the execution cost of fuzz testing, the added test component shall minimize the controller output (i.e. degrade its performance), maximize the noise level while keeping the ECU functional $\psi[k] \in C(x[k-1])$.
 	
 	\begin{align}
-		q\opt = \min_{q}h(x,u')|_{\psi \in C}
+		\pi\opt = \min_{\pi}h(x,u')|_{\psi \in C}
 	\end{align}
 	
 	\begin{figure}[h]
@@ -173,8 +180,8 @@
 	\end{align}
 	
 	\begin{align}				
-		J_\Q(\params) = \mathbb{E}_{(s_t,a_t)\sim\mathcal{D}} \Bigg[ \frac{1}{2} \Big( \Q_\params(s_t, a_t) - \Big( \reward(s_t,a_t) + {} \notag \\
-		\discount \mathbb{E}_{s_{t+1}\sim\pdyn} \left[ V_{\bar\params}(s_{t+1}) \right] \Big) \Big)^2 \Bigg]							
+		J_\Q(\params) = &\mathbb{E}_{(s_t,a_t)\sim\mathcal{D}} \Bigg[ \frac{1}{2} \Big( \Q_\params(s_t, a_t) - {} \notag \\
+		&\Big( \reward(s_t,a_t) + \discount \mathbb{E}_{s_{t+1}\sim\pdyn} \left[ V_{\bar\params}(s_{t+1}) \right] \Big) \Big)^2 \Bigg]							
 		\label{eq:q_cost}		
 	\end{align}
 	
@@ -247,10 +254,10 @@
 		The same as above, only the distribution is zeroed again, so $\textbf{a} \in \boldsymbol{\mu}$. The action is constant for $\Delta t = 0.01 s$
 	\end{enumerate}                        		
 	
-	$Agent_a$ is using pattern $a$, $Agent_b$, $Agent_c$ and $Agent_d$ are using patterns $b$, $c$ and $d$ respectively.
+	$Agent_a$ is using pattern $a$, $Agent_b$, $Agent_c$ and $Agent_d$ are using patterns $b$, $c$ and $d$ respectively. See \autoref{FIG:TestResults}.
 			
 	\subsection{Training}
-	The trained agent is "disturbing" the ABS operation. ~\autoref{FIG:Performance} shows the baseline operation and the four test cases. The upper graph row shows wheel speeds and at the lower row the lateral acceleration during the braking. The failing ABS control either does not optimally utilize the adhesion resulting in longer stopping distance or in lost control. The test strategy in which real noise is also injected (pattern $a$ and $c$) besides the selected false target signal value shows better results in terms of more degraded overall ABS operation. The $Agent_a$ using continuous action space with noise (pattern $a$) was able to block the front wheels, however the ABS control was able to get back to a better operation range. The overall best agent ($Agent_c$) is the one which utilized a discrete action space efficiently disturbing the performance with frequent over-optimal wheel braking.
+	The trained agent is "disturbing" the ABS operation. ~\autoref{FIG:Performance} shows the baseline operation and the four test cases. The upper graph row shows wheel speeds and at the lower row the lateral acceleration during the braking. The failing ABS control either does not optimally utilize the adhesion resulting in longer stopping distance or in lost control. The test strategy in which real noise is also injected (pattern $a$ and $c$) besides the selected false target signal value shows better results in terms of more degraded overall ABS operation. The $Agent_a$ using continuous action space with noise (pattern $a$) was able to block the front wheels, however the ABS control was able to get back to a better operation range. The best performing agent ($Agent_c$) is the one which utilized a discrete action space efficiently disturbing the performance with frequent over-optimal wheel braking.
 	
 	\begin{figure*}[hb]
 		\centering
@@ -292,26 +299,9 @@
 		
 	As shown in \autoref{tab:action_space_comparison} agents with noise in their actions tend to yield the better expected and maximum rewards then those without using noise. The action type whether it is continuous or discrete is more relevant in the learning speed than the presence of noise. 		
 	
-	\subsection{Results}
-	Using conventional fuzzing the degradation of the lateral acceleration is relatively small, the test does not exploit potential issues of the filter, however the fuzzing has an effect as the simulation without signal filter shows. The accumulated lateral acceleration in the continuous, offset and range action space is 6.47 $\frac{m}{s^2}$, in the continuous and offset only case is 8.57 $\frac{m}{s^2}$, in the discrete, offset and range action space is 4.99 $\frac{m}{s^2}$, in the discrete and offset only case is 8.30 $\frac{m}{s^2}$ 
-	The agents with continuous action space has the option to influence ABS control with optimized target deviation signals, while in case of agents with discrete action space the common target deviation is used for both axles. \autoref{FIG:TestResults} shows in the first two columns the different deviation targets and the last two columns the common targets. The resulting wheel speeds are different in the two sides even in the case of common actions due to the turning maneuver. The test trial shows that despite that the agents with side wise separated actions have the option to influence the lateral acceleration with the effect of different side wise braking force, it has not been exploited.
-	
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=\columnwidth]{figures/AgentPerformanceGrid.pdf}
-		\caption{Using the agent of pattern $c$ on different maneuvers. The graphs are showing the lateral acceleration during braking over the braking period. The upper lines in each figure is the base line performance, while the lower line is the result of the trained agent injecting noises.}
-		\label{FIG:PerformanceGrid}
-	\end{figure}	
-	
-	The agent is trained on a specific maneuver described earlier, however it still performs on different driving conditions. \autoref{FIG:PerformanceGrid} shows emergency braking on different road surfaces and with different evasions. From left to right the road friction varies as $\mu \in [0.4, 0.5, 0.6, 0.7, 0.8]$ and from top to down as $ valami \in [a b c a]$. As expected the figures show decreasing stopping distances as the road surface becomes drier and wheels have more grip. The agent shows good performance in test cases with low $\mu$ and it is less efficient when the friction is higher. 
-	
-	The ABS controller has to achieve the goal in which the vehicle stops the quickest but it still can be steered. As \autoref{FIG:WheelSlips} shows if the controller optimizes for a higher slips depending on the road conditions it achieves higher longitudinal braking force, while less lateral force. And vice versa from steering point of view the optimum is at the lower slips. The agents are trained to decrease the ABS performance of steering ability, which resulted in improving the stopping distances. This explains that the graphs show improved stopping distance when agent disturbs the ABS operation. 
-			
-	\subsection{Hyperparameters}
-	
 	\autoref{tab:shared_params} lists the common SAC parameters used in the comparative evaluation in \autoref{FIG:Performance}.
 	
-	\begin{table}[b]
+	\begin{table}[hb]
 		\renewcommand{\arraystretch}{1.1}
 		\centering		
 		\vspace{1mm}
@@ -337,14 +327,31 @@
 		\label{tab:shared_params}
 	\end{table}
 	
+	\subsection{Results}
+	Using conventional fuzzing the degradation of the lateral acceleration is relatively small, the test does not exploit potential issues of the filter, however the fuzzing has an effect as the simulation without signal filter shows. The accumulated lateral acceleration in the continuous, offset and range action space is 6.47 $\frac{m}{s^2}$, in the continuous and offset only case is 8.57 $\frac{m}{s^2}$, in the discrete, offset and range action space is 4.99 $\frac{m}{s^2}$, in the discrete and offset only case is 8.30 $\frac{m}{s^2}$ 
+	The agents with continuous action space has the option to influence ABS control with optimized target deviation signals, while in case of agents with discrete action space the common target deviation is used for both axles. \autoref{FIG:TestResults} shows in the first two columns the different deviation targets and the last two columns the common targets. The resulting wheel speeds are different in the two sides even in the case of common actions due to the turning maneuver. The test trial shows that despite that the agents with side wise separated actions have the option to influence the lateral acceleration with the effect of different side wise braking force, it has not been exploited.
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\columnwidth]{figures/AgentPerformanceGrid.pdf}
+		\caption{Using the agent of pattern $c$ on different maneuvers. The graphs are showing the lateral acceleration during braking over the braking period. The upper lines in each figure is the base line performance, while the lower line is the result of the trained agent injecting noises.}
+		\label{FIG:PerformanceGrid}
+	\end{figure}	
+	
+	The agent is trained on a specific maneuver described earlier, however it still performs on different driving conditions. \autoref{FIG:PerformanceGrid} shows emergency braking on different road surfaces and with different evasions. From left to right the road friction varies as $\mu \in [0.4, 0.5, 0.6, 0.7, 0.8]$ and from top to down as $ valami \in [a b c a]$. As expected the figures show decreasing stopping distances as the road surface becomes drier and wheels have more grip. The agent shows good performance in test cases with low $\mu$ and it is less efficient when the friction is higher. 
+	
+	The ABS controller has to achieve the goal in which the vehicle stops the quickest but it still can be steered. As \autoref{FIG:WheelSlips} shows if the controller optimizes for a higher slips depending on the road conditions it achieves higher longitudinal braking force, while less lateral force. And vice versa from steering point of view the optimum is at the lower slips. The agents are trained to decrease the ABS performance of steering ability, which resulted in improving the stopping distances. This explains that the graphs show improved stopping distance when agent disturbs the ABS operation. 
+			
 	\section{Conclusion}
-	The proposed test method is verified with model-in-the-loop (MIL) environment with a plant model of a detailed passenger vehicle model. The system under test (SUT) is a simplified Matlab/Simulink ABS controller with a signal conditioning. The ABS controller receives timewise discrete and sensor signals a test execution setup in which the system under test performs significantly worst than the baseline operation. The test environment contains an RL agent which is trained by consecutive execution of the test maneuver. During each maneuver the agent injects noise and evaluate its effect, after the maneuver refines its strategy in order to find the optimal test execution setup.
-	The emphasis is on its automatic behavior. It finds the most problematic operation of the system under test without the active guidance of the tester. Mixing noise to the true signal samples most likely ensure that the basic operation of the controller is preserved, allowing a more subtle analysis of operation.
-	The trained agent can be reused in the test environment for model-in-the-loop (MIL) testing in which the controller model is directly taken from the ECU code, or the source Matlab/Simulink control model for software-in-the-loop (SIL) testing in which the whole ECU code is used for HIL testing in which a the real-time simulation environment encapsulate a physical ECU
-
+	The proposed test method is verified with simplified model-in-the-loop (MIL) environment with a plant model of a detailed passenger vehicle model. The system under test (SUT) is a simplified Matlab/Simulink ABS controller with a signal conditioning. The ABS receives sensor signal periodically sampled and subsequently converted into a fixed-point representation for further processing.
+	The outlined test execution setup showed that the SUT performs significantly worst than the baseline operation. The test environment contains an RL agent which is trained by consecutive execution of the test maneuver. During each maneuver the agent injects noise and evaluate its effect, after the maneuver refines its strategy in order to find the optimal test execution setup.
+	The emphasis is on its automatic behavior. It finds the most problematic operation of the system under test without the active guidance of the tester. Mixing noise to the true signal samples will either be filtered out by the signal conditioning infrastructure, used with altered controller performance or in worst case breaks the controller by exploiting a hidden bug. The result of the test shall be evaluated from functional safety point of view: if the agent produce noise within the specification the result shall also be in the acceptable range. However if the agent produced noise is out of specification and the performance is not acceptable, the review signal conditioning performance as well as the assessment of the case from cyber security point of view.
+	The proposed setup with the trained agent can be a test bed for the control logic with its signal conditioning infrastructure (model-in-the-loop - MIL), the complete ECU software including all of its functionality (software-in-the-loop - SIL) and finally the real ECU (hardware-in-the-loop). 
+	 
+	 
 	\bibliographystyle{cas-model2-names}	
 	\bibliography{References}
 				
 	
-	\listoftodos		
+	%\listoftodos		
 \end{document}
