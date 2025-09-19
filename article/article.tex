@@ -145,7 +145,7 @@
 		\end{center}
 	\end{figure}
 	
-	The additional test item is a Reinforcement Learning actor. The actor gets its obeservation from the test environment state $x[k]$ and issue its actions as noises $a[k]$.
+	The additional test item is a Deep Reinforcement Learning actor. The actor gets its observation from the test environment state $x[k]$ and issue its actions as noises $a[k]$.
 	The agent contains two components: a policy $\pi$ and a learning algorithm.
 	The policy is a mapping from the current environment observation $x[k]$ to a probability distribution of the actions $a$ to be taken. Within an agent, the policy ("test program") is implemented by a function approximator with tunable parameters $\pi_\pparams$ and a specific approximation model, such as a deep neural network.
 	The learning algorithm continuously updates the policy learnable parameters based on the actions $a[k]$, observations $x[k]$, and rewards $y[k]$. 
